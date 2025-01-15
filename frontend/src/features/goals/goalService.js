@@ -11,15 +11,16 @@ const getGoals = async (token) => {
     }
     
     try {
-        console.log('-----------------')
+        console.log('Making request to:', API_URL)
+        console.log('With config:', config)
         const response = await axios.get(API_URL, config)
-        console.log(response.data)
+        console.log('Response received:', response.data)
         return response.data
     } catch (error) {
-        console.error(error)
+        console.error('Error in getGoals:', error.response || error)
         throw error
+        }
     }
-}
 
 //Create goal
 const createGoal = async (text, token) => {

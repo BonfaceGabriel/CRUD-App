@@ -24,20 +24,44 @@ function Dashboard() {
 
  
 useEffect(() => {
-  console.log('Start of use effect')
+  console.log('Use effect triggered:', {
+    user: !user,
+    isError,
+    message
+  })
   if (isError) {
     console.log(message)
   }
 
   if (!user) {
+    console.log('No user found, navigating to login')
     navigate('/login')
   }
-  console.log('get goals')
-  dispatch(getGoals())
+  const fetchGoals = async () => {
+    try {
+      console.log('Dispatching getGoals')
+      const result = await dispatch(getGoals()).unwrap()
+      console.log('GetGoals result:', result)
+    } catch (error) {
+      console.error('GetGoals error:', error)
+      toast.error(error.toString())
+    }
+  }
 
-}, [navigate, user, isError, dispatch])
+  fetchGoals()
+  
+  return () => {
+    console.log('Cleanup: resetting goals state')
+    dispatch(reset())
+  }
+}, [user, navigate, dispatch])
     
-console.log('Rendering component');
+console.log('Current goals state:', {
+  goals,
+  isLoading,
+  isError,
+  message
+})
 
   if(isLoading){
       return <Spinner />
@@ -50,6 +74,14 @@ console.log('Rendering component');
         <h1>Welcome {user && user.name}</h1>
       </section>
       <GoalForm />
+
+      <div>
+        {goals?.length > 0 ? (
+          goals.map(goal => <div key={goal._id}>{goal.text}</div>)
+        ) : (
+          <p>No goals found</p> 
+         
+        )} </div>
     </>
   )
 }
